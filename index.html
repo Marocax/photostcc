@@ -77,51 +77,6 @@ body{background:#030503;margin:0}
   .nav-btn,#btn-next{justify-self:center;width:100%;max-width:240px}
   #nav-counter{order:-1}
 }
-  /* AJUSTE PARA FIGMA / IFRAME: mostra tudo sem scroll interno */
-html,
-body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-#app {
-  width: 100%;
-  height: 100vh;
-  min-height: 0;
-  overflow: hidden;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
-}
-
-#hero {
-  min-height: 0;
-  overflow: hidden;
-}
-
-#media-card {
-  min-height: 0;
-  height: 100%;
-}
-
-#img-box {
-  height: clamp(260px, 48vh, 340px);
-  min-height: 0;
-  overflow: hidden;
-}
-
-#img-plate {
-  min-height: 0;
-  padding: 0;
-}
-
-#img-plate img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center center;
-  transform: none !important;
-}
 </style>
 </head>
 <body>
