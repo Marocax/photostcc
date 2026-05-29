@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arquivo de Consoles</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#00ff88;
+  --g2:#00cc66;
+  --b:#050805;
+  --b2:#0b130b;
+  --b3:#112211;
+  --dim:#173117;
+  --text:#c5ffd1;
+  --soft:#ebefea;
+  --soft2:#cfd5cd;
+  --acc:#ffdd00;
+}
+body{background:#030503;margin:0}
+#app{min-height:100vh;background:var(--b);color:var(--text);font-family:'Share Tech Mono',monospace;border:1px solid var(--g2);position:relative;overflow:hidden}
+#scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px);opacity:.5}
+#header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--g2);background:var(--b2);position:relative;z-index:1}
+.hdr-label{font-family:'Orbitron',sans-serif;color:var(--g);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+#hero{display:grid;grid-template-columns:minmax(360px,540px) minmax(0,1fr);gap:clamp(56px,6vw,96px);align-items:start;padding:26px 42px;border-bottom:1px solid var(--dim);position:relative;z-index:1}
+#media-card{background:linear-gradient(180deg,rgba(17,34,17,.92),rgba(8,18,8,.92));border:1px solid var(--dim);padding:20px;display:flex;flex-direction:column;gap:16px;min-height:560px}
+#viewer-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+#viewer-kicker{font-size:12px;letter-spacing:.14em;color:var(--g2);text-transform:uppercase}
+#launch-pill{font-size:11px;letter-spacing:.12em;padding:5px 10px;border:1px solid var(--acc);color:var(--acc);text-transform:uppercase}
+#img-box{flex:1;min-height:390px;border:1px solid var(--g2);background:#061006;display:flex;align-items:center;justify-content:center;padding:18px;position:relative}
+#img-box:before,#img-box:after{content:'';position:absolute;width:14px;height:14px}
+#img-box:before{top:8px;left:8px;border-top:2px solid var(--g);border-left:2px solid var(--g)}
+#img-box:after{bottom:8px;right:8px;border-bottom:2px solid var(--g);border-right:2px solid var(--g)}
+#img-plate{width:100%;height:100%;background:linear-gradient(180deg,var(--soft),var(--soft2));display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+#img-plate img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .25s ease}
+#img-plate img.fade{opacity:.18}
+#year-panel{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+#year-label{font-size:12px;color:var(--g2);letter-spacing:.14em;text-transform:uppercase}
+#year-big{font-family:'Orbitron',sans-serif;font-size:92px;line-height:.92;color:var(--g);text-shadow:0 0 18px rgba(0,255,136,.28)}
+#year-sub{font-size:11px;color:var(--acc);letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--acc);padding:6px 10px}
+#info-col{display:flex;flex-direction:column;justify-content:flex-start;gap:18px;min-width:0;padding-top:52px}
+#console-name{font-family:'Orbitron',sans-serif;font-size:54px;line-height:1.05;color:#f3fff7;text-shadow:0 0 12px rgba(0,255,136,.2)}
+#maker-line{font-size:22px;line-height:1.35;color:var(--g);letter-spacing:.08em}
+#desc-box{font-size:27px;line-height:1.62;color:var(--text);max-width:1000px}
+#badges{display:flex;flex-wrap:wrap;gap:10px}
+.badge{font-size:14px;padding:6px 10px;border:1px solid var(--g2);color:var(--g);background:rgba(0,255,136,.05)}
+#credit-row{padding:14px 26px 6px;font-size:12px;color:#7acb96;position:relative;z-index:1}
+#credit-row a{color:#8fffb6;text-decoration:none;border-bottom:1px dotted rgba(143,255,182,.45)}
+#credit-row a:hover{color:#fff}
+#dots-row{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;padding:16px 26px;border-top:1px solid var(--dim);border-bottom:1px solid var(--dim);background:var(--b3);position:relative;z-index:1}
+.dot{width:11px;height:11px;border:1px solid var(--g2);opacity:.35;cursor:pointer;transition:all .18s ease}
+.dot:hover{opacity:.75;transform:scale(1.08)}
+.dot.active{opacity:1;background:var(--g);box-shadow:0 0 8px rgba(0,255,136,.6)}
+#nav-section{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:18px 26px;background:var(--b2);position:relative;z-index:1}
+.nav-btn{justify-self:start;font-family:'Share Tech Mono',monospace;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--g);background:transparent;border:1px solid var(--g2);padding:10px 18px;cursor:pointer}
+#btn-next{justify-self:end}
+.nav-btn:hover{background:rgba(0,255,136,.08);color:#fff}
+.nav-btn:disabled{opacity:.25;cursor:default}
+#nav-counter{font-family:'Orbitron',sans-serif;font-size:22px;color:var(--g);letter-spacing:.12em}
+#empty-state{font-size:18px;color:#355a35;text-align:center;padding:24px}
+@media (max-width:1100px){#hero{grid-template-columns:1fr;gap:24px;padding:22px}#info-col{padding-top:0}
+  #console-name{font-size:40px}
+  #desc-box{font-size:22px}
+  #year-big{font-size:72px}
+}
+@media (max-width:680px){#hero{padding:16px}#header{padding:10px 12px;flex-direction:column;align-items:flex-start}
+  #hero{padding:16px;gap:18px}
+  #media-card{min-height:auto;padding:14px}
+  #img-box{min-height:260px}
+  #console-name{font-size:30px}
+  #maker-line{font-size:18px}
+  #desc-box{font-size:18px;line-height:1.55}
+  #year-big{font-size:54px}
+  #nav-section{grid-template-columns:1fr;justify-items:center}
+  .nav-btn,#btn-next{justify-self:center;width:100%;max-width:240px}
+  #nav-counter{order:-1}
+}
+/* LAYOUT VERTICAL FINAL — IMAGEM EM CIMA, DESCRIÇÃO EMBAIXO */
+#hero {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 26px 42px;
+  border-bottom: 1px solid var(--dim);
+  position: relative;
+  z-index: 1;
+}
+
+#media-card {
+  width: 100%;
+  min-height: auto;
+  background: linear-gradient(180deg, rgba(17, 34, 17, .92), rgba(8, 18, 8, .92));
+  border: 1px solid var(--dim);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#viewer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#img-box {
+  width: 100%;
+  height: 620px;
+  min-height: 620px;
+  border: 1px solid var(--g2);
+  background: #061006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+#img-box:before,
+#img-box:after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+}
+
+#img-box:before {
+  top: 8px;
+  left: 8px;
+  border-top: 2px solid var(--g);
+  border-left: 2px solid var(--g);
+}
+
+#img-box:after {
+  bottom: 8px;
+  right: 8px;
+  border-bottom: 2px solid var(--g);
+  border-right: 2px solid var(--g);
+}
+
+#img-plate {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+#img-plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+}
+
+#year-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+#info-col {
+  width: 100%;
+  padding-top: 0;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#console-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 52px;
+  line-height: 1.05;
+  color: #f3fff7;
+  text-shadow: 0 0 12px rgba(0, 255, 136, .2);
+}
+
+#maker-line {
+  font-size: 22px;
+  line-height: 1.35;
+  color: var(--g);
+  letter-spacing: .08em;
+}
+
+#desc-box {
+  font-size: 26px;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 1100px;
+}
+
+@media (max-width: 900px) {
+  #hero {
+    padding: 18px;
+  }
+
+  #img-box {
+    height: 460px;
+    min-height: 460px;
+  }
+
+  #console-name {
+    font-size: 36px;
+  }
+
+  #desc-box {
+    font-size: 21px;
+  }
+}
+
+@media (max-width: 600px) {
+  #img-box {
+    height: 340px;
+    min-height: 340px;
+  }
+
+  #console-name {
+    font-size: 28px;
+  }
+
+  #desc-box {
+    font-size: 18px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="scanlines"></div>
+  <header id="header">
+    <span class="hdr-label">◈ ARQUIVO DE CONSOLES — CIVILIZAÇÃO DIGITAL</span>
+    <span class="hdr-label" id="era-tag-top"></span>
+  </header>
+  <main id="hero">
+    <section id="media-card">
+      <div id="viewer-top">
+        <span id="viewer-kicker">VISUAL DO CONSOLE</span>
+        <span id="launch-pill">LINHA DO TEMPO</span>
+      </div>
+      <div id="img-box">
+        <div id="img-plate">
+          <img id="cimg" src="" alt="" />
+        </div>
+      </div>
+      <div id="year-panel">
+        <span id="year-label">ANO DE LANÇAMENTO</span>
+        <div id="year-big"></div>
+        <span id="year-sub"></span>
+      </div>
+    </section>
+    <section id="info-col">
+      <h1 id="console-name"></h1>
+      <div id="maker-line"></div>
+      <div id="desc-box"></div>
+      <div id="badges"></div>
+    </section>
+  </main>
+  <div id="credit-row"><span id="credit-text"></span></div>
+  <div id="dots-row"></div>
+  <div id="nav-section">
+    <button class="nav-btn" id="btn-prev">◀ Anterior</button>
+    <div id="nav-counter"></div>
+    <button class="nav-btn" id="btn-next">Próximo ▶</button>
+  </div>
+</div>
+<script>
+const C = [
+  {
+    "y": 1972,
+    "n": "MAGNAVOX ODYSSEY",
+    "sub": "MAGNAVOX · EUA",
+    "era": "ERA DOS PIONEIROS",
+    "file": "magnavox-odyssey.png",
+    "credit": "Foto: Divulgação/Magnavox",
+    "creditUrl": null,
+    "desc": "O primeiro console doméstico da história, criado por Ralph Baer. Sem CPU, sem sons, sem pontuação — funcionava com sobreposições coloridas na TV. Abriu uma indústria inteira do zero.",
+    "tags": [
+      "PRIMEIRO CONSOLE",
+      "SEM CPU",
+      "~350K UNIDADES"
+    ],
+    "impacto": 100,
+    "vendas": 12,
+    "nostalgia": 88,
+    "tech": 45
+  },
+  {
+    "y": 1975,
+    "n": "ATARI HOME PONG",
+    "sub": "ATARI · EUA",
+    "era": "ERA DOS PIONEIROS",
+    "file": "atari-home-pong.png",
+    "credit": "Fonte: Google Arts & Culture",
+    "creditUrl": "https://artsandculture.google.com/",
+    "desc": "A versão doméstica do arcade Pong. Dois botões giratórios, um jogo embutido — e provou para o mundo que videogames podiam ser vendidos em lojas para o consumidor comum.",
+    "tags": [
+      "CIRCUITO DEDICADO",
+      "1 JOGO",
+      "MARCO COMERCIAL"
+    ],
+    "impacto": 82,
+    "vendas": 18,
+    "nostalgia": 85,
+    "tech": 38
+  },
+  {
+    "y": 1976,
+    "n": "FAIRCHILD CHANNEL F",
+    "sub": "FAIRCHILD SEMICONDUCTOR · EUA",
+    "era": "ERA DOS PIONEIROS",
+    "file": "fairchild-channel-f.png",
+    "credit": "Fonte: Wikipedia — Fairchild Channel F",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Ficheiro:Fairchild-Channel-F-System-II-Console.jpg",
+    "desc": "O primeiro console com cartuchos ROM intercambiáveis. O conceito que moldou toda a indústria: um aparelho, vários jogos. Tinha CPU real — o Fairchild F8.",
+    "tags": [
+      "1º CARTUCHO ROM",
+      "FAIRCHILD F8",
+      "CONCEITO FUNDADOR"
+    ],
+    "impacto": 88,
+    "vendas": 14,
+    "nostalgia": 60,
+    "tech": 78
+  },
+  {
+    "y": 1977,
+    "n": "ATARI 2600",
+    "sub": "ATARI · EUA",
+    "era": "ERA ATARI",
+    "file": "atari-2600.png",
+    "credit": "Fonte: Wikipedia — Atari 2600",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Atari_2600",
+    "desc": "Um dos consoles mais icônicos de todos os tempos. Space Invaders, Pac-Man e Pitfall viraram febre mundial. Dominou os lares por anos e definiu o que era um videogame.",
+    "tags": [
+      "MOS 6507",
+      "30M UNIDADES",
+      "SPACE INVADERS · PITFALL"
+    ],
+    "impacto": 98,
+    "vendas": 72,
+    "nostalgia": 98,
+    "tech": 55
+  },
+  {
+    "y": 1979,
+    "n": "MATTEL INTELLIVISION",
+    "sub": "MATTEL · EUA",
+    "era": "ERA ATARI",
+    "file": "intellivision.png",
+    "credit": "Fonte: Wikipedia — Intellivision",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Intellivision",
+    "desc": "Rival do Atari 2600 com gráficos superiores e controle numérico diferentão. Primeiro console com expansão de voz — o Intellivoice. Competiu ferozmente por anos.",
+    "tags": [
+      "GI CP1610",
+      "3M+ UNIDADES",
+      "1º VOICE ADD-ON"
+    ],
+    "impacto": 72,
+    "vendas": 35,
+    "nostalgia": 78,
+    "tech": 65
+  },
+  {
+    "y": 1983,
+    "n": "FAMICOM / NES",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "REVOLUÇÃO NINTENDO",
+    "file": "nes.png",
+    "credit": "Fonte: Wikipedia — NES",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Nintendo_Entertainment_System",
+    "desc": "Ressuscitou a indústria após o crash de 1983. Super Mario Bros, Zelda, Metroid. A Nintendo redefiniu qualidade de jogos e estabeleceu o padrão que perdura até hoje.",
+    "tags": [
+      "RICOH 2A03",
+      "61.9M UNIDADES",
+      "MARIO · ZELDA · METROID"
+    ],
+    "impacto": 100,
+    "vendas": 88,
+    "nostalgia": 100,
+    "tech": 68
+  },
+  {
+    "y": 1986,
+    "n": "SEGA MASTER SYSTEM",
+    "sub": "SEGA · JAPÃO",
+    "era": "REVOLUÇÃO NINTENDO",
+    "file": "master-system.png",
+    "credit": "Fonte: Wikipedia — Master System",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Master_System",
+    "desc": "Rival do NES. No Brasil, a TecToy fabricou o Master System por décadas — fenômeno único no mundo. Mais popular aqui do que em qualquer outro lugar do planeta.",
+    "tags": [
+      "ZILOG Z80",
+      "13M UNIDADES",
+      "FENÔMENO NO BRASIL"
+    ],
+    "impacto": 78,
+    "vendas": 55,
+    "nostalgia": 95,
+    "tech": 60
+  },
+  {
+    "y": 1989,
+    "n": "GAME BOY",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA PORTÁTIL",
+    "file": "game-boy.png",
+    "credit": "Fonte: Wikipedia — Game Boy",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Game_Boy",
+    "desc": "O tijolinho cinza que definiu os portáteis. Tela sem luz, bateria absurda e Tetris na caixa. Pokémon tornou-se fenômeno cultural global. 118 milhões de unidades.",
+    "tags": [
+      "SHARP LR35902",
+      "118.7M UNIDADES",
+      "TETRIS · POKÉMON"
+    ],
+    "impacto": 95,
+    "vendas": 92,
+    "nostalgia": 100,
+    "tech": 62
+  },
+  {
+    "y": 1988,
+    "n": "SEGA MEGA DRIVE",
+    "sub": "SEGA · JAPÃO",
+    "era": "ERA 16-BIT",
+    "file": "mega-drive.png",
+    "credit": "Fonte: Wikipedia — Mega Drive",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Mega_Drive",
+    "desc": "Blast Processing! Sonic virou ícone, Streets of Rage definiu o gênero e Mortal Kombat chegou com sangue. A Sega foi agressiva e quase venceu a batalha dos 16 bits.",
+    "tags": [
+      "MOTOROLA 68000",
+      "30.75M UNIDADES",
+      "SONIC · STREETS OF RAGE"
+    ],
+    "impacto": 90,
+    "vendas": 70,
+    "nostalgia": 96,
+    "tech": 75
+  },
+  {
+    "y": 1990,
+    "n": "SUPER NINTENDO",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA 16-BIT",
+    "file": "super-nintendo.png",
+    "credit": "Fonte: Wikipedia — Super Nintendo",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Super_Nintendo_Entertainment_System",
+    "desc": "O melhor console de todos os tempos para muitos. Modo 7, som de 16 canais, Chrono Trigger, FF VI, Super Metroid. A Nintendo no seu absoluto apogeu criativo.",
+    "tags": [
+      "RICOH 5A22",
+      "49.1M UNIDADES",
+      "CHRONO TRIGGER · FF VI"
+    ],
+    "impacto": 98,
+    "vendas": 85,
+    "nostalgia": 100,
+    "tech": 80
+  },
+  {
+    "y": 1994,
+    "n": "SONY PLAYSTATION",
+    "sub": "SONY · JAPÃO",
+    "era": "ERA 3D",
+    "file": "playstation.png",
+    "credit": "Fonte: Wikipedia — PlayStation",
+    "creditUrl": "https://pt.wikipedia.org/wiki/PlayStation_(console)",
+    "desc": "A Sony entrou no mercado e nunca mais saiu. CD-ROM, 3D poligonal, Final Fantasy VII, Metal Gear Solid, Crash Bandicoot. Os games se tornaram cultura pop adulta.",
+    "tags": [
+      "MIPS R3000A",
+      "102.5M UNIDADES",
+      "FF VII · METAL GEAR SOLID"
+    ],
+    "impacto": 98,
+    "vendas": 95,
+    "nostalgia": 98,
+    "tech": 88
+  },
+  {
+    "y": 1994,
+    "n": "SEGA SATURN",
+    "sub": "SEGA · JAPÃO",
+    "era": "ERA 3D",
+    "file": "sega-saturn.png",
+    "credit": "Fonte: Wikipedia — Sega Saturn",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Sega_Saturn",
+    "desc": "Impressionante mas difícil de programar — perdeu o 3D para o PS1. Amado por fãs de 2D. Nights into Dreams e Panzer Dragoon são obras-primas injustiçadas.",
+    "tags": [
+      "DUAL SH-2",
+      "9.5M UNIDADES",
+      "NIGHTS · PANZER DRAGOON"
+    ],
+    "impacto": 68,
+    "vendas": 38,
+    "nostalgia": 82,
+    "tech": 78
+  },
+  {
+    "y": 1996,
+    "n": "NINTENDO 64",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA 3D",
+    "file": "nintendo-64.png",
+    "credit": "Fonte: Wikipedia — Nintendo 64",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Nintendo_64",
+    "desc": "Super Mario 64 reinventou os plataformas. Zelda: Ocarina of Time é o melhor jogo de todos os tempos para muitos. GoldenEye definiu o shooter multiplayer em consoles.",
+    "tags": [
+      "NEC VR4300",
+      "33M UNIDADES",
+      "MARIO 64 · ZELDA OOT"
+    ],
+    "impacto": 96,
+    "vendas": 72,
+    "nostalgia": 98,
+    "tech": 85
+  },
+  {
+    "y": 1998,
+    "n": "SEGA DREAMCAST",
+    "sub": "SEGA · JAPÃO",
+    "era": "ERA ONLINE",
+    "file": "dreamcast.png",
+    "credit": "Fonte: Wikipedia — Sega Dreamcast",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Ficheiro:Sega-dreamcast-set.png",
+    "desc": "O último e mais amado console da Sega. Primeiro online nativo, VMU com tela, Sonic Adventure, Shenmue. Morreu antes do tempo — tornou-se lenda.",
+    "tags": [
+      "HITACHI SH-4",
+      "10.6M UNIDADES",
+      "PRIMEIRO ONLINE NATIVO"
+    ],
+    "impacto": 82,
+    "vendas": 35,
+    "nostalgia": 92,
+    "tech": 88
+  },
+  {
+    "y": 2000,
+    "n": "PLAYSTATION 2",
+    "sub": "SONY · JAPÃO",
+    "era": "ERA ONLINE",
+    "file": "playstation-2.png",
+    "credit": "Fonte: Wikipedia — PlayStation 2",
+    "creditUrl": "https://pt.wikipedia.org/wiki/PlayStation_2",
+    "desc": "O console mais vendido de todos os tempos. 155 milhões de unidades. DVD player embutido. GTA San Andreas, Shadow of the Colossus, God of War. Uma era dourada.",
+    "tags": [
+      "EMOTION ENGINE",
+      "155M UNIDADES — RECORDE",
+      "GTA SA · GOD OF WAR"
+    ],
+    "impacto": 100,
+    "vendas": 100,
+    "nostalgia": 100,
+    "tech": 85
+  },
+  {
+    "y": 2001,
+    "n": "XBOX",
+    "sub": "MICROSOFT · EUA",
+    "era": "ERA ONLINE",
+    "file": "xbox.png",
+    "credit": "Fonte: Wikipedia — Xbox",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Xbox_(console)",
+    "desc": "A Microsoft entrou no mercado com hardware poderoso, HD embutido e Xbox Live — revolucionando o multiplayer online. Halo: Combat Evolved justificou sozinho a compra.",
+    "tags": [
+      "PENTIUM III",
+      "24M UNIDADES",
+      "XBOX LIVE · HALO"
+    ],
+    "impacto": 85,
+    "vendas": 50,
+    "nostalgia": 88,
+    "tech": 90
+  },
+  {
+    "y": 2001,
+    "n": "NINTENDO GAMECUBE",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA ONLINE",
+    "file": "gamecube.png",
+    "credit": "Fonte: Wikipedia — Nintendo GameCube",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Nintendo_GameCube",
+    "desc": "Pequeno, roxo e subestimado. Metroid Prime, Resident Evil 4, Smash Bros Melee e Wind Waker fazem dele um clássico cultuado por quem teve a sorte de jogá-lo.",
+    "tags": [
+      "IBM GEKKO",
+      "21.7M UNIDADES",
+      "METROID PRIME · RE4"
+    ],
+    "impacto": 78,
+    "vendas": 45,
+    "nostalgia": 90,
+    "tech": 80
+  },
+  {
+    "y": 2004,
+    "n": "NINTENDO DS",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA HD",
+    "file": "nintendo-ds.png",
+    "credit": "Fonte: Wikipedia — Nintendo DS",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Nintendo_DS",
+    "desc": "Duas telas, touchscreen e microfone mudaram os portáteis para sempre. 154 milhões de unidades — segundo mais vendido da história. Mario Kart e Pokémon para todos.",
+    "tags": [
+      "ARM9 + ARM7",
+      "154M UNIDADES",
+      "TOUCHSCREEN · DUAL SCREEN"
+    ],
+    "impacto": 90,
+    "vendas": 95,
+    "nostalgia": 92,
+    "tech": 78
+  },
+  {
+    "y": 2005,
+    "n": "XBOX 360",
+    "sub": "MICROSOFT · EUA",
+    "era": "ERA HD",
+    "file": "xbox-360.png",
+    "credit": "Fonte: Meu Game Usado",
+    "creditUrl": "https://www.meugameusado.com.br/console-xbox-360-slim-4gb-microsoft-8516182",
+    "desc": "Chegou primeiro na era HD. Achievements viraram vício, Xbox Live virou padrão. Halo 3, Gears of War, Mass Effect. Uma geração épica para os fãs de tiro e RPG.",
+    "tags": [
+      "IBM XENON",
+      "84M UNIDADES",
+      "HALO 3 · GEARS OF WAR"
+    ],
+    "impacto": 88,
+    "vendas": 82,
+    "nostalgia": 90,
+    "tech": 88
+  },
+  {
+    "y": 2006,
+    "n": "NINTENDO WII",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA HD",
+    "file": "nintendo-wii.png",
+    "credit": "Fonte: Wikipedia — Wii",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Wii",
+    "desc": "Controle por movimento levou videogame a quem nunca tinha jogado. Wii Sports em academias e asilos. 101 milhões de unidades. Mario Galaxy e Zelda para os hardcores.",
+    "tags": [
+      "IBM BROADWAY",
+      "101.6M UNIDADES",
+      "CONTROLE POR MOVIMENTO"
+    ],
+    "impacto": 92,
+    "vendas": 92,
+    "nostalgia": 88,
+    "tech": 82
+  },
+  {
+    "y": 2006,
+    "n": "PLAYSTATION 3",
+    "sub": "SONY · JAPÃO",
+    "era": "ERA HD",
+    "file": "playstation-3.png",
+    "credit": "Fonte: Wikipedia — PlayStation 3",
+    "creditUrl": "https://pt.wikipedia.org/wiki/PlayStation_3",
+    "desc": "Cell processor e Blu-ray. Começou caro e complicado, terminou glorioso. Uncharted, The Last of Us, Journey e Demon's Souls elevaram jogos à condição de arte.",
+    "tags": [
+      "CELL BROADBAND",
+      "87.4M UNIDADES",
+      "UNCHARTED · THE LAST OF US"
+    ],
+    "impacto": 90,
+    "vendas": 85,
+    "nostalgia": 90,
+    "tech": 92
+  },
+  {
+    "y": 2011,
+    "n": "NINTENDO 3DS",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "ERA HD",
+    "file": "nintendo-3ds.png",
+    "credit": "Fonte: Wikipedia — Nintendo 3DS",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Nintendo_3DS",
+    "desc": "3D sem óculos, StreetPass e câmera dupla. O último portátil dedicado de grande sucesso antes dos smartphones tomarem o mercado. 76 milhões de unidades.",
+    "tags": [
+      "ARM11",
+      "76M UNIDADES",
+      "3D SEM ÓCULOS · STREETPASS"
+    ],
+    "impacto": 80,
+    "vendas": 78,
+    "nostalgia": 85,
+    "tech": 80
+  },
+  {
+    "y": 2013,
+    "n": "PLAYSTATION 4",
+    "sub": "SONY · JAPÃO",
+    "era": "GERAÇÃO ATUAL",
+    "file": "playstation-4.png",
+    "credit": "Fonte: Wikipedia — PlayStation 4",
+    "creditUrl": "https://pt.wikipedia.org/wiki/PlayStation_4",
+    "desc": "Sony dominou uma geração. 117 milhões de unidades. God of War, Horizon, Spider-Man, The Last of Us Part II. Obras-primas que elevaram definitivamente os games à arte.",
+    "tags": [
+      "AMD JAGUAR x8",
+      "117.2M UNIDADES",
+      "GOD OF WAR · SPIDER-MAN"
+    ],
+    "impacto": 96,
+    "vendas": 96,
+    "nostalgia": 88,
+    "tech": 88
+  },
+  {
+    "y": 2013,
+    "n": "XBOX ONE",
+    "sub": "MICROSOFT · EUA",
+    "era": "GERAÇÃO ATUAL",
+    "file": "xbox-one.png",
+    "credit": "Fonte: Wikipedia — Xbox One",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Xbox_One",
+    "desc": "Tentou ser a central da sala de estar. Perdeu feio no começo, recuperou com o Game Pass — o modelo de assinatura que mudou a indústria para sempre.",
+    "tags": [
+      "AMD JAGUAR x8",
+      "~51M UNIDADES",
+      "GAME PASS · HALO 5"
+    ],
+    "impacto": 78,
+    "vendas": 72,
+    "nostalgia": 72,
+    "tech": 85
+  },
+  {
+    "y": 2017,
+    "n": "NINTENDO SWITCH",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "GERAÇÃO ATUAL",
+    "file": "nintendo-switch.png",
+    "credit": "Fonte: Wikipedia — Nintendo Switch",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Nintendo_Switch",
+    "desc": "Genialidade pura: TV e portátil no mesmo aparelho. Zelda: Breath of the Wild lançou junto. 146 milhões+ de unidades — o terceiro mais vendido da história.",
+    "tags": [
+      "NVIDIA TEGRA X1",
+      "146M+ UNIDADES",
+      "ZELDA BOTW · MARIO ODYSSEY"
+    ],
+    "impacto": 96,
+    "vendas": 95,
+    "nostalgia": 88,
+    "tech": 85
+  },
+  {
+    "y": 2020,
+    "n": "PLAYSTATION 5",
+    "sub": "SONY · JAPÃO",
+    "era": "GERAÇÃO ATUAL",
+    "file": "playstation-5.png",
+    "credit": "Fonte: PlayStation Brasil",
+    "creditUrl": "https://www.playstation.com/pt-br/ps5/",
+    "desc": "SSD que zerou os loadings. DualSense com feedback háptico e gatilhos adaptáveis revolucionaram o controle. Astro's Playroom mostrou o futuro. 59 milhões+ de unidades.",
+    "tags": [
+      "AMD ZEN 2 x8",
+      "59M+ UNIDADES",
+      "DUALSENSE HÁPTICO"
+    ],
+    "impacto": 92,
+    "vendas": 85,
+    "nostalgia": 60,
+    "tech": 96
+  },
+  {
+    "y": 2020,
+    "n": "XBOX SERIES X/S",
+    "sub": "MICROSOFT · EUA",
+    "era": "GERAÇÃO ATUAL",
+    "file": "xbox-series-xs.png",
+    "credit": "Fonte: Xbox Support Brasil",
+    "creditUrl": "https://support.xbox.com/pt-BR/help/hardware-network/console/introducing-xbox-series-x-s",
+    "desc": "Retrocompatibilidade total, Xbox Velocity Architecture e Game Pass para todos. O Series S democratizou a próxima geração com preço acessível.",
+    "tags": [
+      "AMD ZEN 2 x8",
+      "~21M UNIDADES",
+      "GAME PASS · 4K"
+    ],
+    "impacto": 82,
+    "vendas": 62,
+    "nostalgia": 55,
+    "tech": 95
+  },
+  {
+    "y": 2021,
+    "n": "STEAM DECK",
+    "sub": "VALVE · EUA",
+    "era": "GERAÇÃO ATUAL",
+    "file": "steam-deck.png",
+    "credit": "Fonte: Wikipedia — Steam Deck",
+    "creditUrl": "https://pt.wikipedia.org/wiki/Steam_Deck",
+    "desc": "Valve colocou um PC completo no bolso. Roda todo catálogo Steam, suporta mods e emulação com Linux customizado. Criou uma nova categoria que ninguém esperava.",
+    "tags": [
+      "AMD ZEN 2 PORTÁTIL",
+      "~3M UNIDADES",
+      "PC LINUX · TODO STEAM"
+    ],
+    "impacto": 80,
+    "vendas": 42,
+    "nostalgia": 45,
+    "tech": 96
+  },
+  {
+    "y": 2025,
+    "n": "NINTENDO SWITCH 2",
+    "sub": "NINTENDO · JAPÃO",
+    "era": "GERAÇÃO ATUAL",
+    "file": "nintendo-switch-2.png",
+    "credit": "Fonte: Nintendo Brasil",
+    "creditUrl": "https://www.nintendo.com/pt-br/gaming-systems/switch-2/features/",
+    "desc": "Tela de 7.9 polegadas, Joy-Con magnéticos, botão C para GameChat e GPU muito mais potente. Compatível com jogos do Switch 1. Mario Kart World no lançamento.",
+    "tags": [
+      "NVIDIA TEGRA+",
+      "SWITCH 2",
+      "JOY-CON MAGNÉTICOS"
+    ],
+    "impacto": 82,
+    "vendas": 38,
+    "nostalgia": 62,
+    "tech": 88
+  },
+  {
+    "y": 2024,
+    "n": "PLAYSTATION 5 PRO",
+    "sub": "SONY · JAPÃO",
+    "era": "GERAÇÃO ATUAL",
+    "file": "playstation-5-pro.png",
+    "credit": "Fonte: PlayStation Brasil",
+    "creditUrl": "https://www.playstation.com/pt-br/ps5/ps5-pro/",
+    "desc": "GPU mais potente, ray tracing aprimorado e PSSR para upscaling. O modelo Pro busca entregar mais estabilidade visual e performance dentro da geração PS5.",
+    "tags": [
+      "PS5 PRO",
+      "PSSR",
+      "RAY TRACING"
+    ],
+    "impacto": 85,
+    "vendas": 30,
+    "nostalgia": 40,
+    "tech": 100
+  }
+];
+let idx = 0;
+function go(i) {
+  const img = document.getElementById('cimg');
+  img.classList.add('fade');
+  setTimeout(() => {
+    idx = i;
+    const c = C[idx];
+    img.onerror = () => {
+      img.removeAttribute('src');
+      img.alt = 'Imagem não encontrada';
+      img.style.display = 'none';
+      let old = document.getElementById('empty-state');
+      if (!old) {
+        old = document.createElement('div');
+        old.id = 'empty-state';
+        old.textContent = 'Imagem não encontrada neste nome de arquivo.';
+        document.getElementById('img-plate').appendChild(old);
+      }
+      img.classList.remove('fade');
+    };
+    const old = document.getElementById('empty-state');
+    if (old) old.remove();
+    img.style.display = 'block';
+    img.src = c.file;
+    img.alt = c.n;
+    img.onload = () => img.classList.remove('fade');
+    document.getElementById('year-big').textContent = c.y;
+    document.getElementById('year-sub').textContent = c.era;
+    document.getElementById('era-tag-top').textContent = c.era;
+    document.getElementById('console-name').textContent = c.n;
+    document.getElementById('maker-line').textContent = '> ' + c.sub;
+    document.getElementById('desc-box').textContent = c.desc;
+    document.getElementById('badges').innerHTML = (c.tags || []).map(t => `<span class="badge">[${t}]</span>`).join('');
+    const cr = document.getElementById('credit-text');
+    cr.innerHTML = c.creditUrl
+      ? `> FONTE DA IMAGEM: <a href="${c.creditUrl}" target="_blank" rel="noopener noreferrer">${c.credit}</a>`
+      : `> FONTE DA IMAGEM: ${c.credit}`;
+    document.getElementById('nav-counter').textContent = (idx + 1).toString().padStart(2, '0') + ' / ' + C.length.toString().padStart(2, '0');
+    document.getElementById('btn-prev').disabled = idx === 0;
+    document.getElementById('btn-next').disabled = idx === C.length - 1;
+    document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === idx));
+  }, 120);
+}
+document.getElementById('dots-row').innerHTML = C.map((c, i) => `<span class="dot${i === 0 ? ' active' : ''}" onclick="go(${i})" title="${c.n} (${c.y})"></span>`).join('');
+document.getElementById('btn-prev').addEventListener('click', () => { if (idx > 0) go(idx - 1); });
+document.getElementById('btn-next').addEventListener('click', () => { if (idx < C.length - 1) go(idx + 1); });
+go(0);
+</script>
+</body>
+</html>
