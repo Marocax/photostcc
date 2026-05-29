@@ -122,34 +122,6 @@ body {
   object-position: center center;
   transform: none !important;
 }
-
-/* Força duas colunas dentro do iframe do Figma */
-@media (min-width: 760px) {
-  #hero {
-    display: grid !important;
-    grid-template-columns: minmax(300px, 430px) minmax(0, 1fr) !important;
-    gap: clamp(28px, 4vw, 56px) !important;
-    padding: 16px 24px 12px !important;
-    align-items: start !important;
-  }
-
-  #info-col {
-    padding-top: 38px !important;
-  }
-}
-
-@media (max-width: 759px) {
-  html,
-  body,
-  #app {
-    height: auto;
-    overflow: auto;
-  }
-
-  #img-box {
-    height: 300px;
-  }
-}
 </style>
 </head>
 <body>
