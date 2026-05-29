@@ -439,8 +439,16 @@ body {
   </div>
 </div>
 <script>
-const C = [
-  {
+idx = i;
+const c = C[idx];
+
+if (c.file.includes("game-boy.png")) {
+  img.style.maxHeight = "78%";
+  img.style.maxWidth = "78%";
+} else {
+  img.style.maxHeight = "100%";
+  img.style.maxWidth = "100%";
+}
     "y": 1972,
     "n": "MAGNAVOX ODYSSEY",
     "sub": "MAGNAVOX · EUA",
