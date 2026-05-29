@@ -77,6 +77,79 @@ body{background:#030503;margin:0}
   .nav-btn,#btn-next{justify-self:center;width:100%;max-width:240px}
   #nav-counter{order:-1}
 }
+  /* AJUSTE PARA FIGMA / IFRAME: mostra tudo sem scroll interno */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+}
+
+#hero {
+  min-height: 0;
+  overflow: hidden;
+}
+
+#media-card {
+  min-height: 0;
+  height: 100%;
+}
+
+#img-box {
+  height: clamp(260px, 48vh, 340px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+#img-plate {
+  min-height: 0;
+  padding: 0;
+}
+
+#img-plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  transform: none !important;
+}
+
+/* Força duas colunas dentro do iframe do Figma */
+@media (min-width: 760px) {
+  #hero {
+    display: grid !important;
+    grid-template-columns: minmax(300px, 430px) minmax(0, 1fr) !important;
+    gap: clamp(28px, 4vw, 56px) !important;
+    padding: 16px 24px 12px !important;
+    align-items: start !important;
+  }
+
+  #info-col {
+    padding-top: 38px !important;
+  }
+}
+
+@media (max-width: 759px) {
+  html,
+  body,
+  #app {
+    height: auto;
+    overflow: auto;
+  }
+
+  #img-box {
+    height: 300px;
+  }
+}
 </style>
 </head>
 <body>
