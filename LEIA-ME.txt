@@ -1,0 +1,5 @@
+Pacote com imagens recortadas para remover o excesso de espaço em branco do canvas.
+
+Use estes arquivos no GitHub substituindo os antigos.
+Mantenha os nomes exatamente como estão.
+O index.html já aponta para os links do GitHub Pages.
